@@ -39,6 +39,9 @@
                                v-show="sortSettings.direction === 'up'"/>
                         </template>
                     </th>
+                    <th class="w-auto">
+                        {{ lang.manager.table.actions }}
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -62,6 +65,9 @@
                     <td>
                         {{ timestampToDate(directory.timestamp) }}
                     </td>
+                    <td class="text-center actions" v-on:click="contextMenu(directory, $event)">
+                        <i class="fa fa-ellipsis-h"></i>
+                    </td>
                 </tr>
                 <tr v-for="(file, index) in files"
                     v-bind:key="`f-${index}`"
@@ -80,6 +86,9 @@
                     </td>
                     <td>
                         {{ timestampToDate(file.timestamp) }}
+                    </td>
+                    <td class="text-center actions" v-on:click="contextMenu(file, $event)">
+                        <i class="fa fa-ellipsis-h"></i>
                     </td>
                 </tr>
             </tbody>
@@ -137,6 +146,10 @@ export default {
             & > i {
                 padding-left: 0.5rem;
             }
+        }
+
+        td.actions:hover {
+            cursor: pointer;
         }
 
         td {

@@ -1,8 +1,8 @@
 <template>
-    <div class="fm-navbar mb-3">
+    <div class="fm-navbar">
         <div class="row justify-content-between">
             <div class="col-auto">
-                <div class="btn-group" role="group">
+                <div class="btn-group mb-3" role="group">
                     <button type="button" class="btn btn-secondary"
                             v-bind:disabled="backDisabled"
                             v-bind:title="lang.btn.back"
@@ -21,7 +21,7 @@
                         <i class="fas fa-sync-alt"/>
                     </button>
                 </div>
-                <div class="btn-group" role="group">
+                <div class="btn-group mb-3" role="group">
                     <button type="button" class="btn btn-secondary"
                             v-on:click="showModal('NewFile')"
                             v-bind:title="lang.btn.file">
@@ -51,7 +51,7 @@
                         <i class="fas fa-trash-alt"/>
                     </button>
                 </div>
-                <div class="btn-group" role="group">
+                <div class="btn-group mb-3" role="group">
                     <button type="button" class="btn btn-secondary"
                             v-bind:disabled="!isAnyItemSelected"
                             v-bind:title="lang.btn.copy"
@@ -71,7 +71,7 @@
                         <i class="fas fa-paste"/>
                     </button>
                 </div>
-                <div class="btn-group" role="group">
+                <div class="btn-group mb-3" role="group">
                     <button type="button" class="btn btn-secondary"
                             v-bind:title="lang.btn.hidden"
                             v-on:click="toggleHidden">
@@ -80,7 +80,7 @@
                 </div>
             </div>
             <div class="col-auto text-right">
-                <div class="btn-group" role="group">
+                <div class="btn-group mb-3" role="group">
                     <button type="button" class="btn btn-secondary"
                             v-bind:class="[viewType === 'table' ? 'active' : '']"
                             v-on:click="selectView('table')"
@@ -94,19 +94,12 @@
                         <i class="fas fa-th"/>
                     </button>
                 </div>
-                <div class="btn-group" role="group">
+                <div class="btn-group mb-3" role="group">
                     <button type="button" class="btn btn-secondary"
                             v-bind:title="lang.btn.fullScreen"
                             v-bind:class="{ active: fullScreen }"
                             v-on:click="screenToggle">
                         <i class="fas fa-expand-arrows-alt"/>
-                    </button>
-                </div>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-secondary"
-                            v-bind:title="lang.btn.about"
-                            v-on:click="showModal('About')">
-                        <i class="fas fa-question"/>
                     </button>
                 </div>
             </div>

@@ -59,6 +59,7 @@ const en = {
   },
   manager: {
     table: {
+      actions: 'Actions',
       date: 'Date',
       folder: 'Folder',
       name: 'Name',
