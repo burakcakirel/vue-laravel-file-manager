@@ -41,7 +41,7 @@
                     </th>
                 </tr>
             </thead>
-            <tbody>
+            <draggable tag="tbody" v-model="list" :move="onMove" @update="onUpdate" @clone="onClone" @sort="onSort" @unchoose="onUnChoose">
                 <tr v-if="!isRootPath">
                     <td colspan="4" class="fm-content-item" v-on:click="levelUp">
                         <i class="fas fa-level-up-alt"/>
@@ -82,12 +82,13 @@
                         {{ timestampToDate(file.timestamp) }}
                     </td>
                 </tr>
-            </tbody>
+            </draggable>
         </table>
     </div>
 </template>
 
 <script>
+import draggable from 'vuedraggable';
 import translate from '../../mixins/translate';
 import helper from '../../mixins/helper';
 import managerHelper from './mixins/manager';
@@ -95,6 +96,7 @@ import managerHelper from './mixins/manager';
 export default {
   name: 'table-view',
   mixins: [translate, helper, managerHelper],
+  components: { draggable },
   props: {
     manager: { type: String, required: true },
   },
@@ -106,6 +108,19 @@ export default {
     sortSettings() {
       return this.$store.state.fm[this.manager].sort;
     },
+    list: {
+      get() {
+        const dirs = this.$store.getters[`fm/${this.manager}/directories`];
+        const files = this.$store.getters[`fm/${this.manager}/files`];
+        // filesAndFolders.push(this.$store.state.fm[this.manager].directories);
+        // dirs.push(this.$store.state.fm[this.manager].files);
+        return dirs.concat(files);
+      },
+      // eslint-disable-next-line no-unused-vars
+      set(value) {
+        // this.$store.commit('updateList', value);
+      },
+    },
   },
   methods: {
     /**
@@ -114,6 +129,80 @@ export default {
      */
     sortBy(field) {
       this.$store.dispatch(`fm/${this.manager}/sortBy`, { field, direction: null });
+    },
+    onUnChoose(event) {
+      if (event.originalEvent.type !== 'drop') {
+        return;
+      }
+      const selectedDir = this.$store.state.fm[this.manager].selectedDirectory;
+      let file = {};
+      let directory = {};
+
+      if (selectedDir === null) {
+        file = this.list[event.oldIndex];
+        directory = this.list[event.originalEvent.target.parentElement.sectionRowIndex];
+      } else {
+        file = this.list[event.oldIndex - 1];
+
+        if (event.originalEvent.target.parentElement.sectionRowIndex === 0) {
+          const pathUp = selectedDir.split('/').slice(0, -1).join('/');
+
+          directory = { path: pathUp, type: 'pathUp' };
+        } else {
+          directory = this.list[event.originalEvent.target.parentElement.sectionRowIndex - 1];
+        }
+      }
+
+      if (directory.type === 'file') {
+        return;
+      }
+
+      const type = 'files';
+
+      this.$store.commit(`fm/${this.manager}/changeSelected`, { type, path: file.path });
+      this.$store.dispatch('fm/toClipboard', 'cut');
+
+      this.$store.commit(`fm/${this.manager}/setSelectedDirectory`, directory.path);
+      this.$store.dispatch('fm/paste');
+
+      // load directory
+      if (selectedDir === null) {
+        this.$store.commit(`fm/${this.manager}/setSelectedDirectory`, null);
+        this.$store.dispatch(`fm/${this.manager}/selectDirectory`, { path: null });
+      } else if (directory.type === 'pathUp') {
+        this.$store.commit(`fm/${this.manager}/setSelectedDirectory`, selectedDir);
+        this.$store.dispatch(`fm/${this.manager}/selectDirectory`, { path: selectedDir });
+      } else {
+        const pathUp = directory.path.split('/').slice(0, -1).join('/');
+
+        this.$store.commit(`fm/${this.manager}/setSelectedDirectory`, pathUp);
+        this.$store.dispatch(`fm/${this.manager}/selectDirectory`, { path: pathUp });
+      }
+
+      // this.$store.dispatch(`fm/${this.manager}/selectDirectory`, { path: selectedDir.path || null, history: true });
+
+      // console.log(event);
+    },
+    onMove(event) {
+      console.log(event);
+      console.log('onmove');
+
+      // return false;
+    },
+    onUpdate() {
+      console.log('onupdate');
+
+      return false;
+    },
+    onSort(event) {
+      console.log(event);
+
+      return false;
+    },
+    onClone() {
+      console.log('onsort');
+
+      return false;
     },
   },
 };
