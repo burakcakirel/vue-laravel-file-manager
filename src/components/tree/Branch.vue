@@ -1,7 +1,7 @@
 <template>
-    <ul class="list-unstyled fm-tree-branch">
-        <li v-for="(directory, index) in subDirectories" v-bind:key="index">
-            <p class="unselectable"
+    <draggable tag="ul" v-model="list" @unchoose="onUnChoose" class="list-unstyled fm-tree-branch">
+        <li v-for="(directory, index) in subDirectories" v-bind:key="index" :data-index="index">
+            <p class="unselectable fm-tree-item"
                v-bind:class="{'selected': isDirectorySelected(directory.path)}"
                v-on:click="selectDirectory(directory.path)">
                 <i class="far"
@@ -25,12 +25,15 @@
                 </branch>
             </transition>
         </li>
-    </ul>
+    </draggable>
 </template>
 
 <script>
+import draggable from 'vuedraggable';
+
 export default {
   name: 'Branch',
+  components: { draggable },
   props: {
     parentId: { type: Number, required: true },
   },
@@ -41,6 +44,15 @@ export default {
      */
     subDirectories() {
       return this.$store.getters['fm/tree/directories'].filter((item) => item.parentId === this.parentId);
+    },
+    list: {
+      get() {
+        return this.$store.getters['fm/tree/directories'];
+      },
+      // eslint-disable-next-line no-unused-vars
+      set(value) {
+        // this.$store.commit('updateList', value);
+      },
     },
   },
   methods: {
@@ -86,6 +98,9 @@ export default {
       if (!this.isDirectorySelected(path)) {
         this.$store.dispatch('fm/left/selectDirectory', { path, history: true });
       }
+    },
+    onUnChoose(event) {
+      console.log(event);
     },
   },
 };

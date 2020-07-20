@@ -41,7 +41,7 @@
                     </th>
                 </tr>
             </thead>
-            <draggable tag="tbody" v-model="list" :move="onMove" @update="onUpdate" @clone="onClone" @sort="onSort" @unchoose="onUnChoose">
+            <draggable tag="tbody" v-model="list" multi-drag selected-class="table-info" @unchoose="onUnChoose" :move="onMove" @update="onUpdate" @clone="onClone" @sort="onSort">
                 <tr v-if="!isRootPath">
                     <td colspan="4" class="fm-content-item" v-on:click="levelUp">
                         <i class="fas fa-level-up-alt"/>
@@ -130,36 +130,65 @@ export default {
     sortBy(field) {
       this.$store.dispatch(`fm/${this.manager}/sortBy`, { field, direction: null });
     },
+    findDirectoryIndex: (state, path) => state.fm.tree.directories.findIndex((el) => el.basename === path),
     onUnChoose(event) {
       if (event.originalEvent.type !== 'drop') {
         return;
       }
+
       const selectedDir = this.$store.state.fm[this.manager].selectedDirectory;
       let file = {};
       let directory = {};
+      let cancelEvent = false;
+      let dropTree = false;
+      const { list } = this;
+      let items = this.list;
+      let targetIndex = event.originalEvent.target.parentElement.sectionRowIndex;
 
-      if (selectedDir === null) {
-        file = this.list[event.oldIndex];
-        directory = this.list[event.originalEvent.target.parentElement.sectionRowIndex];
-      } else {
-        file = this.list[event.oldIndex - 1];
-
-        if (event.originalEvent.target.parentElement.sectionRowIndex === 0) {
-          const pathUp = selectedDir.split('/').slice(0, -1).join('/');
-
-          directory = { path: pathUp, type: 'pathUp' };
-        } else {
-          directory = this.list[event.originalEvent.target.parentElement.sectionRowIndex - 1];
-        }
+      if (event.originalEvent.target.classList.contains('fm-tree-item')) {
+        dropTree = true;
+        items = this.$store.getters['fm/tree/directories'];
+        targetIndex = this.findDirectoryIndex(this.$store.state, event.originalEvent.target.textContent.trim());
       }
 
-      if (directory.type === 'file') {
+      this.$store.commit(`fm/${this.manager}/resetSelected`);
+
+      if (event.oldIndicies.length === 0) {
+        event.oldIndicies.push({ index: event.oldIndex });
+      }
+
+      event.oldIndicies.forEach((element) => {
+        if (selectedDir === null) {
+          file = list[element.index];
+          directory = items[targetIndex];
+        } else {
+          file = list[element.index - 1];
+
+          if (dropTree) {
+            directory = items[targetIndex];
+          } else if (targetIndex === 0) {
+            const pathUp = selectedDir.split('/').slice(0, -1).join('/');
+
+            directory = { path: pathUp, type: 'pathUp' };
+          } else {
+            directory = items[targetIndex - 1];
+          }
+        }
+
+        if (directory.type === 'file' || file.type === 'dir') {
+          cancelEvent = true;
+          return;
+        }
+
+        const type = 'files';
+
+        this.$store.commit(`fm/${this.manager}/setSelected`, { type, path: file.path });
+      });
+
+      if (cancelEvent) {
         return;
       }
 
-      const type = 'files';
-
-      this.$store.commit(`fm/${this.manager}/changeSelected`, { type, path: file.path });
       this.$store.dispatch('fm/toClipboard', 'cut');
 
       this.$store.commit(`fm/${this.manager}/setSelectedDirectory`, directory.path);
@@ -169,7 +198,7 @@ export default {
       if (selectedDir === null) {
         this.$store.commit(`fm/${this.manager}/setSelectedDirectory`, null);
         this.$store.dispatch(`fm/${this.manager}/selectDirectory`, { path: null });
-      } else if (directory.type === 'pathUp') {
+      } else if (directory.type === 'pathUp' || dropTree) {
         this.$store.commit(`fm/${this.manager}/setSelectedDirectory`, selectedDir);
         this.$store.dispatch(`fm/${this.manager}/selectDirectory`, { path: selectedDir });
       } else {
