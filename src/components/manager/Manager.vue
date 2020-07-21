@@ -43,9 +43,6 @@ export default {
     .fm-content {
         height: 100%;
         padding-left: 1rem;
-
-        .fm-content-body {
-            overflow: auto;
-        }
+        overflow: auto;
     }
 </style>

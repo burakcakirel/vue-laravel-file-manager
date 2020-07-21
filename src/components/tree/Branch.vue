@@ -1,5 +1,5 @@
 <template>
-    <draggable tag="ul" v-model="list" @unchoose="onUnChoose" class="list-unstyled fm-tree-branch">
+    <draggable tag="ul" v-model="list" :disabled="true" @unchoose="onUnChoose" class="list-unstyled fm-tree-branch">
         <li v-for="(directory, index) in subDirectories" v-bind:key="index" :data-index="index">
             <p class="unselectable fm-tree-item"
                v-bind:class="{'selected': isDirectorySelected(directory.path)}"

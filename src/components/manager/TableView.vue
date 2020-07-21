@@ -41,7 +41,18 @@
                     </th>
                 </tr>
             </thead>
-            <draggable tag="tbody" v-model="list" multi-drag selected-class="table-info" @unchoose="onUnChoose" :move="onMove" @update="onUpdate" @clone="onClone" @sort="onSort">
+            <draggable tag="tbody"
+                       v-model="list"
+                       multi-drag
+                       selected-class="table-info"
+                       delay="400"
+                       :delay-on-touch-only="true"
+                       :sort="false"
+                       @unchoose="onUnChoose"
+                       :move="onMove"
+                       @update="onUpdate"
+                       @clone="onClone"
+                       @sort="onSort">
                 <tr v-if="!isRootPath">
                     <td colspan="4" class="fm-content-item" v-on:click="levelUp">
                         <i class="fas fa-level-up-alt"/>
@@ -131,11 +142,8 @@ export default {
       this.$store.dispatch(`fm/${this.manager}/sortBy`, { field, direction: null });
     },
     findDirectoryIndex: (state, path) => state.fm.tree.directories.findIndex((el) => el.basename === path),
-    onUnChoose(event) {
-      if (event.originalEvent.type !== 'drop') {
-        return;
-      }
 
+    moveDocuments(event) {
       const selectedDir = this.$store.state.fm[this.manager].selectedDirectory;
       let file = {};
       let directory = {};
@@ -143,21 +151,40 @@ export default {
       let dropTree = false;
       const { list } = this;
       let items = this.list;
-      let targetIndex = event.originalEvent.target.parentElement.sectionRowIndex;
+      let targetElement = {};
 
-      if (event.originalEvent.target.classList.contains('fm-tree-item')) {
+      if (this.targetElement) {
+        targetElement = this.targetElement;
+      } else {
+        targetElement = event.originalEvent.target;
+      }
+
+      let targetIndex = targetElement.parentElement.sectionRowIndex;
+
+      if (targetElement.classList.contains('fm-tree-item')) {
         dropTree = true;
         items = this.$store.getters['fm/tree/directories'];
-        targetIndex = this.findDirectoryIndex(this.$store.state, event.originalEvent.target.textContent.trim());
+        targetIndex = this.findDirectoryIndex(this.$store.state, targetElement.textContent.trim());
+      }
+
+      if (targetElement.classList.contains('fm-content-item') === false && dropTree === false) {
+        this.targetElement = undefined;
+        return;
       }
 
       this.$store.commit(`fm/${this.manager}/resetSelected`);
+      this.targetElement = undefined;
 
       if (event.oldIndicies.length === 0) {
         event.oldIndicies.push({ index: event.oldIndex });
       }
 
       event.oldIndicies.forEach((element) => {
+        if (typeof element.index === 'undefined') {
+          cancelEvent = true;
+          return;
+        }
+
         if (selectedDir === null) {
           file = list[element.index];
           directory = items[targetIndex];
@@ -175,14 +202,16 @@ export default {
           }
         }
 
-        if (directory.type === 'file' || file.type === 'dir') {
+        if ((typeof directory !== 'undefined' && directory.type === 'file') || (typeof file !== 'undefined' && file.type === 'dir')) {
           cancelEvent = true;
           return;
         }
 
         const type = 'files';
 
-        this.$store.commit(`fm/${this.manager}/setSelected`, { type, path: file.path });
+        if (typeof file !== 'undefined') {
+          this.$store.commit(`fm/${this.manager}/setSelected`, { type, path: file.path });
+        }
       });
 
       if (cancelEvent) {
@@ -212,14 +241,36 @@ export default {
 
       // console.log(event);
     },
-    onMove(event) {
+    onUnChoose(event) {
+      console.log('onUnChoose');
       console.log(event);
-      console.log('onmove');
+      console.log(this.targetElement);
 
-      // return false;
+      if (event.originalEvent.type === 'touchcancel') {
+        this.targetElement = undefined;
+      }
+
+      if (event.originalEvent.changedTouches && event.originalEvent.changedTouches.length > 0 && event.originalEvent.type === 'touchend' && typeof this.targetElement === 'undefined') {
+        this.targetElement = document.elementFromPoint(event.originalEvent.changedTouches[0].clientX, event.originalEvent.changedTouches[0].clientY);
+      }
+
+      if (event.originalEvent.type === 'drop' || (event.originalEvent.type === 'touchend' && typeof this.targetElement !== 'undefined')) {
+        this.moveDocuments(event);
+      }
+    },
+    onMove(event) {
+      console.log('onMove');
+      console.log(event);
+
+      if (event.originalEvent.type === 'dragenter' || event.originalEvent.type === 'dragover') {
+        this.targetElement = undefined;
+        return;
+      }
+
+      this.targetElement = event.originalEvent.target.firstChild;
     },
     onUpdate() {
-      console.log('onupdate');
+      console.log('onUpdate');
 
       return false;
     },
@@ -229,7 +280,7 @@ export default {
       return false;
     },
     onClone() {
-      console.log('onsort');
+      console.log('onSort');
 
       return false;
     },
