@@ -82,31 +82,10 @@
             <div class="col-auto text-right">
                 <div class="btn-group" role="group">
                     <button type="button" class="btn btn-secondary"
-                            v-bind:class="[viewType === 'table' ? 'active' : '']"
-                            v-on:click="selectView('table')"
-                            v-bind:title="lang.btn.table">
-                        <i class="fas fa-th-list"/>
-                    </button>
-                    <button role="button" class="btn btn-secondary"
-                            v-bind:class="[viewType === 'grid' ? 'active' : '']"
-                            v-on:click="selectView('grid')"
-                            v-bind:title="lang.btn.grid">
-                        <i class="fas fa-th"/>
-                    </button>
-                </div>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-secondary"
                             v-bind:title="lang.btn.fullScreen"
                             v-bind:class="{ active: fullScreen }"
                             v-on:click="screenToggle">
                         <i class="fas fa-expand-arrows-alt"/>
-                    </button>
-                </div>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-secondary"
-                            v-bind:title="lang.btn.about"
-                            v-on:click="showModal('About')">
-                        <i class="fas fa-question"/>
                     </button>
                 </div>
             </div>
