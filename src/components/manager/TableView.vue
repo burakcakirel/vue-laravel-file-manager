@@ -49,10 +49,7 @@
                        :delay-on-touch-only="true"
                        :sort="false"
                        @unchoose="onUnChoose"
-                       :move="onMove"
-                       @update="onUpdate"
-                       @clone="onClone"
-                       @sort="onSort">
+                       :move="onMove">
                 <tr v-if="!isRootPath">
                     <td colspan="4" class="fm-content-item" v-on:click="levelUp">
                         <i class="fas fa-level-up-alt"/>
@@ -123,8 +120,6 @@ export default {
       get() {
         const dirs = this.$store.getters[`fm/${this.manager}/directories`];
         const files = this.$store.getters[`fm/${this.manager}/files`];
-        // filesAndFolders.push(this.$store.state.fm[this.manager].directories);
-        // dirs.push(this.$store.state.fm[this.manager].files);
         return dirs.concat(files);
       },
       // eslint-disable-next-line no-unused-vars
@@ -236,16 +231,8 @@ export default {
         this.$store.commit(`fm/${this.manager}/setSelectedDirectory`, pathUp);
         this.$store.dispatch(`fm/${this.manager}/selectDirectory`, { path: pathUp });
       }
-
-      // this.$store.dispatch(`fm/${this.manager}/selectDirectory`, { path: selectedDir.path || null, history: true });
-
-      // console.log(event);
     },
     onUnChoose(event) {
-      console.log('onUnChoose');
-      console.log(event);
-      console.log(this.targetElement);
-
       if (event.originalEvent.type === 'touchcancel') {
         this.targetElement = undefined;
       }
@@ -259,30 +246,12 @@ export default {
       }
     },
     onMove(event) {
-      console.log('onMove');
-      console.log(event);
-
       if (event.originalEvent.type === 'dragenter' || event.originalEvent.type === 'dragover') {
         this.targetElement = undefined;
         return;
       }
 
       this.targetElement = event.originalEvent.target.firstChild;
-    },
-    onUpdate() {
-      console.log('onUpdate');
-
-      return false;
-    },
-    onSort(event) {
-      console.log(event);
-
-      return false;
-    },
-    onClone() {
-      console.log('onSort');
-
-      return false;
     },
   },
 };
