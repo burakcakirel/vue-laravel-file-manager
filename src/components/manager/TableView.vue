@@ -162,6 +162,15 @@ export default {
         targetIndex = this.findDirectoryIndex(this.$store.state, targetElement.textContent.trim());
       }
 
+      if (targetElement.classList.contains('root-path')) {
+        dropTree = true;
+        items.push({
+          type: 'dir',
+          path: '',
+        });
+        targetIndex = items.length - 1;
+      }
+
       if (targetElement.classList.contains('fm-content-item') === false && dropTree === false) {
         this.targetElement = undefined;
         return;
@@ -237,11 +246,18 @@ export default {
         this.targetElement = undefined;
       }
 
+      if (event.originalEvent.type === 'dragend') {
+        const targetElement = document.elementFromPoint(event.originalEvent.clientX, event.originalEvent.clientY);
+        if (targetElement.classList.contains('root-path')) {
+          this.targetElement = targetElement;
+        }
+      }
+
       if (event.originalEvent.changedTouches && event.originalEvent.changedTouches.length > 0 && event.originalEvent.type === 'touchend' && typeof this.targetElement === 'undefined') {
         this.targetElement = document.elementFromPoint(event.originalEvent.changedTouches[0].clientX, event.originalEvent.changedTouches[0].clientY);
       }
 
-      if (event.originalEvent.type === 'drop' || (event.originalEvent.type === 'touchend' && typeof this.targetElement !== 'undefined')) {
+      if (event.originalEvent.type === 'drop' || ((event.originalEvent.type === 'touchend' || event.originalEvent.type === 'dragend') && typeof this.targetElement !== 'undefined')) {
         this.moveDocuments(event);
       }
     },
