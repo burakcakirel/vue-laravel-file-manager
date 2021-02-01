@@ -368,6 +368,18 @@ export default {
   },
 
   /**
+   * Make the file/folder available in member portal
+   * @param store
+   * @param disk
+   * @param path
+   * @param checked
+   * @returns {Promise}
+   */
+  showInPortal(store, { disk, path, checked }) {
+    return POST.showInPortal(disk, path, checked);
+  },
+
+  /**
    * Zip files and folders
    * @param state
    * @param getters

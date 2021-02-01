@@ -59,6 +59,21 @@ export default {
   },
 
   /**
+   * Make the file/folder available in member portal
+   * @param disk
+   * @param path
+   * @param checked
+   * @returns {*}
+   */
+  showInPortal(disk, path, checked) {
+    if (checked) {
+      return HTTP.post('showInPortal', { disk, path });
+    } else {
+      return HTTP.post('removeFromPortal', { disk, path });
+    }
+  },
+
+  /**
    * Copy / Cut files and folders
    * @param data
    * @returns {*}

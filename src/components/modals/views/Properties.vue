@@ -79,8 +79,24 @@
                     <div class="col-9">{{ lang.modal.properties['access_' + selectedItem.acl] }}</div>
                 </div>
             </template>
+          <template v-if="selectedItem.hasOwnProperty('showMakeAvailableButton') && selectedItem.showMakeAvailableButton">
+              <div class="row">
+                  <div class="col-9 font-weight-bold">
+                      <label class="form-check-label" for="showInPortal">
+                          {{ lang.modal.properties.make_available_in_portal }}:
+                      </label>
+                  </div>
+                  <div class="col-2">
+                      <input
+                             class="form-check-input"
+                             id="showInPortal"
+                             type="checkbox"
+                             v-model="isShownInPortal">
+                  </div>
+              </div>
+          </template>
         </div>
-    </div>
+</div>
 </template>
 
 <script>
@@ -112,6 +128,18 @@ export default {
      */
     selectedItem() {
       return this.$store.getters['fm/selectedItems'][0];
+    },
+    isShownInPortal: {
+      get() {
+        return this.$store.getters['fm/selectedItems'][0].isShownInPortal;
+      },
+      set(value) {
+        this.$store.dispatch('fm/showInPortal', {
+          disk: this.selectedDisk,
+          path: this.selectedItem.path,
+          checked: value,
+        });
+      },
     },
   },
   methods: {

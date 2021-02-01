@@ -104,6 +104,7 @@ const en = {
       access_0: 'Access denied',
       access_1: 'Only Read',
       access_2: 'Read and Write',
+      make_available_in_portal: 'Make available in member portal',
     },
     rename: {
       directoryExist: 'Directory exists',
