@@ -66,11 +66,7 @@ export default {
    * @returns {*}
    */
   showInPortal(disk, path, checked) {
-    if (checked) {
-      return HTTP.post('showInPortal', { disk, path });
-    } else {
-      return HTTP.post('removeFromPortal', { disk, path });
-    }
+    return checked ? HTTP.post('showInPortal', { disk, path }) : HTTP.post('removeFromPortal', { disk, path });
   },
 
   /**

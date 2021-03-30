@@ -226,18 +226,18 @@ export default {
     position: relative;
     height: 100%;
     padding: 1rem 1rem 0;
-    background-color: white;
+    background-color: #F9F9F9;
 
     &:-moz-full-screen {
-      background-color: white;
+      background-color: #F9F9F9;
     }
 
     &:-webkit-full-screen {
-      background-color: white;
+      background-color: #F9F9F9;
     }
 
     &:fullscreen {
-      background-color: white;
+      background-color: #F9F9F9;
     }
 
     .fm-body {
@@ -269,25 +269,25 @@ export default {
 
   .fm-danger {
     color: #dc3545;
-    background-color: white;
+    background-color: #F9F9F9;
     border-color: #dc3545;
   }
 
   .fm-warning {
     color: #ffc107;
-    background-color: white;
+    background-color: #F9F9F9;
     border-color: #ffc107;
   }
 
   .fm-success {
     color: #28a745;
-    background-color: white;
+    background-color: #F9F9F9;
     border-color: #28a745;
   }
 
   .fm-info {
     color: #17a2b8;
-    background-color: white;
+    background-color: #F9F9F9;
     border-color: #17a2b8;
   }
 
