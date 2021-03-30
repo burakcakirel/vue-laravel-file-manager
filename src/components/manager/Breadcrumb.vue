@@ -95,7 +95,7 @@ export default {
             margin-bottom: 0.5rem;
 
             &.active-manager {
-                background-color: #c2e5eb;
+                //background-color: #c2e5eb;
             }
 
             .breadcrumb-item:not(.active):hover {
